@@ -1,0 +1,321 @@
+-- ********************************************************************
+        SFP DEFINITIONS ::= BEGIN
+
+                IMPORTS
+                        OBJECT-GROUP
+                                FROM SNMPv2-CONF
+                        enterprises, Integer32, IpAddress, Unsigned32, Counter64, OBJECT-TYPE, MODULE-IDENTITY
+                                FROM SNMPv2-SMI
+                        DisplayString, RowStatus, TruthValue, MacAddress
+                                FROM SNMPv2-TC;
+
+--
+-- Node definitions
+--
+-- ********************************************************************
+-- *  MODULE IDENTITY
+-- ********************************************************************
+-- The Enterprises Number
+        peplink OBJECT IDENTIFIER ::= { enterprises 23695 }
+
+        productMib  OBJECT IDENTIFIER ::= { peplink 200 }
+
+        generalMib OBJECT IDENTIFIER ::= { productMib 1 }
+
+        sfpMib MODULE-IDENTITY
+                    LAST-UPDATED "202201171200Z"        -- 01 17, 2022 at 12:00 GMT
+                    ORGANIZATION "PEPLINK"
+                    CONTACT-INFO ""
+                    DESCRIPTION
+                        "MIB module for SFP."
+            ::= { generalMib 16 }
+
+-- #####################################################################
+--
+-- **********************************************************************
+-- *  MIB attribute OBJECT-TYPE definitions follow
+-- **********************************************************************
+        sfpInfo OBJECT IDENTIFIER ::= { sfpMib 1 }
+
+        sfpDiag OBJECT IDENTIFIER ::= { sfpMib 2 }
+
+-- **********************************************************************
+-- *  Table
+-- **********************************************************************
+        sfpInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF SfpInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "SFP info table"
+            ::= { sfpInfo 1 }
+
+            sfpInfoEntry OBJECT-TYPE
+            SYNTAX SfpInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the sfpInfoTable"
+            INDEX { sfpId }
+            ::= { sfpInfoTable 1 }
+
+            SfpInfoEntry ::=
+            SEQUENCE {
+                sfpId
+                    Integer32,
+                sfpInfoConnectorType
+                    OCTET STRING,
+                sfpInfoLaserWavelength
+                    Integer32,
+                sfpInfoNominalBitRate
+                    Integer32
+            }
+
+            sfpId OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "SFP info id."
+                ::= { sfpInfoEntry 1 }
+
+            sfpInfoConnectorType OBJECT-TYPE
+                SYNTAX OCTET STRING
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "SFP connector type."
+                ::= { sfpInfoEntry 2 }
+
+            sfpInfoLaserWavelength OBJECT-TYPE
+                SYNTAX Integer32
+                UNITS 	"Nano Meter (nm)"
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "SFP laser wavelength.
+                     Units: Nano Meter (nm)"
+                ::= { sfpInfoEntry 3 }
+
+            sfpInfoNominalBitRate OBJECT-TYPE
+                SYNTAX Integer32
+                UNITS 	"MBd"
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "The nominal bit (signaling) rate.
+                     Units: MBd"
+                ::= { sfpInfoEntry 4 }
+
+-- **********************************************************************
+-- *  Table
+-- **********************************************************************
+        sfpTransceiverTypeInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF SfpTransceiverTypeInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "SFP transceiver info table"
+            ::= { sfpInfo 2 }
+
+            sfpTransceiverTypeInfoEntry OBJECT-TYPE
+            SYNTAX SfpTransceiverTypeInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the sfpTransceiverTypeInfoTable"
+            INDEX { sfpId, sfpTransceiverTypeInfoId }
+            ::= { sfpTransceiverTypeInfoTable 1 }
+
+            SfpTransceiverTypeInfoEntry ::=
+            SEQUENCE {
+                sfpTransceiverTypeInfoId
+                    Integer32,
+                sfpInfoTransceiverType
+                    OCTET STRING
+            }
+
+            sfpTransceiverTypeInfoId OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "SFP transceiver type id."
+                ::= { sfpTransceiverTypeInfoEntry 1 }
+
+            sfpInfoTransceiverType OBJECT-TYPE
+                SYNTAX OCTET STRING
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "SFP transceiver type."
+                ::= { sfpTransceiverTypeInfoEntry 2 }
+
+-- **********************************************************************
+-- *  Table
+-- **********************************************************************
+        sfpVendorInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF SfpVendorInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "SFP vendor info table"
+            ::= { sfpInfo 3 }
+
+            sfpVendorInfoEntry OBJECT-TYPE
+            SYNTAX SfpVendorInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the sfpVendorInfoTable"
+            INDEX { sfpId }
+            ::= { sfpVendorInfoTable 1 }
+
+            SfpVendorInfoEntry ::=
+            SEQUENCE {
+                sfpVendorInfoOui
+                    OCTET STRING,
+                sfpVendorInfoName
+                    OCTET STRING,
+                sfpVendorInfoPartNumber
+                    OCTET STRING,
+                sfpVendorInfoRevision
+                    OCTET STRING,
+                sfpVendorInfoSerialNumber
+                    OCTET STRING,
+                sfpVendorInfoDateCode
+                    OCTET STRING
+            }
+
+            sfpVendorInfoOui OBJECT-TYPE
+                SYNTAX OCTET STRING
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Vendor OUI."
+                ::= { sfpVendorInfoEntry 1 }
+
+            sfpVendorInfoName OBJECT-TYPE
+                SYNTAX OCTET STRING
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Vendor name."
+                ::= { sfpVendorInfoEntry 2 }
+
+            sfpVendorInfoPartNumber OBJECT-TYPE
+                SYNTAX OCTET STRING
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Vendor part number."
+                ::= { sfpVendorInfoEntry 3 }
+
+            sfpVendorInfoRevision OBJECT-TYPE
+                SYNTAX OCTET STRING
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Vendor revision."
+                ::= { sfpVendorInfoEntry 4 }
+
+            sfpVendorInfoSerialNumber OBJECT-TYPE
+                SYNTAX OCTET STRING
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Vendor serial number."
+                ::= { sfpVendorInfoEntry 5 }
+
+            sfpVendorInfoDateCode OBJECT-TYPE
+                SYNTAX OCTET STRING
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Vendor’s manufacturing date code"
+                ::= { sfpVendorInfoEntry 6 }
+
+-- **********************************************************************
+-- *  Table
+-- **********************************************************************
+        sfpDiagTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF SfpDiagEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "SFP Digital Diagnostic table"
+            ::= { sfpDiag 1 }
+
+            sfpDiagEntry OBJECT-TYPE
+            SYNTAX SfpDiagEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the sfpDiagTable"
+            INDEX { sfpId }
+            ::= { sfpDiagTable 1 }
+
+            SfpDiagEntry ::=
+            SEQUENCE {
+                sfpDiagTemperature
+                    Integer32,
+                sfpDiagVcc
+                    Integer32,
+                sfpDiagTxBiasCurrent
+                    Integer32,
+                sfpDiagTxPower
+                    Integer32,
+                sfpDiagRxPower
+                    Integer32
+            }
+
+            sfpDiagTemperature OBJECT-TYPE
+                SYNTAX Integer32
+                UNITS 	"1 milli degrees Celsius (C)"
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Transceiver temperature.
+                    Units: 1 milli degrees Celsius (C)"
+                ::= { sfpDiagEntry 1 }
+
+            sfpDiagVcc OBJECT-TYPE
+                SYNTAX Integer32
+                UNITS 	"1 micro Volts (V)"
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Transceiver supply voltage.
+                    Units: 1 micro Volts (V)"
+                ::= { sfpDiagEntry 2 }
+
+            sfpDiagTxBiasCurrent OBJECT-TYPE
+                SYNTAX Integer32
+                UNITS 	"1 micro Amperes (A)"
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Transceiver bias current.
+                    Units: 1 micro Amperes (A)"
+                ::= { sfpDiagEntry 3 }
+
+            sfpDiagTxPower OBJECT-TYPE
+                SYNTAX Integer32
+                UNITS 	"1 milli decibel (dBm)"
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Transceiver transmitted power.
+                    Units: 1 milli decibel (dBm)"
+                ::= { sfpDiagEntry 4 }
+
+            sfpDiagRxPower OBJECT-TYPE
+                SYNTAX Integer32
+                UNITS 	"1 milli decibel (dBm)"
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Transceiver received power.
+                     Units: 1 milli decibel (dBm)"
+                ::= { sfpDiagEntry 5 }
+END

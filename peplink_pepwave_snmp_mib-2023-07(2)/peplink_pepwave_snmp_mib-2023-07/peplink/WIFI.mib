@@ -1,0 +1,1447 @@
+-- ********************************************************************
+        WiFi DEFINITIONS ::= BEGIN
+
+                IMPORTS
+                        OBJECT-GROUP
+                                FROM SNMPv2-CONF
+                        enterprises, Integer32, IpAddress, Unsigned32, Counter64, OBJECT-TYPE, MODULE-IDENTITY
+                                FROM SNMPv2-SMI
+                        DisplayString, RowStatus, TruthValue, MacAddress
+                                FROM SNMPv2-TC;
+
+--
+-- Node definitions
+--
+-- ********************************************************************
+-- *  MODULE IDENTITY
+-- ********************************************************************
+-- The Enterprises Number
+        peplink OBJECT IDENTIFIER ::= { enterprises 23695 }
+
+        productMib  OBJECT IDENTIFIER ::= { peplink 200 }
+
+        generalMib OBJECT IDENTIFIER ::= { productMib 1 }
+
+        wifiMib MODULE-IDENTITY
+                    LAST-UPDATED "202303211200Z"        -- 03 21, 2023 at 12:00 GMT
+                    ORGANIZATION "PEPLINK"
+                    CONTACT-INFO ""
+                    DESCRIPTION
+                        "MIB module for Wi-Fi."
+            ::= { generalMib 14 }
+
+-- #####################################################################
+--
+-- **********************************************************************
+-- *  MIB attribute OBJECT-TYPE definitions follow
+-- **********************************************************************
+        wifiRadio OBJECT IDENTIFIER ::= { wifiMib 1 }
+
+        wifiRadioInfo OBJECT IDENTIFIER ::= { wifiRadio 1 }
+
+        wifiRadioConfig OBJECT IDENTIFIER ::= { wifiRadio 2 }
+
+        wifiAp OBJECT IDENTIFIER ::= { wifiMib 2 }
+
+        wifiApInfo OBJECT IDENTIFIER ::= { wifiAp 1 }
+
+        wifiApConfig OBJECT IDENTIFIER ::= { wifiAp 2 }
+
+        wifiApWlanConfig OBJECT IDENTIFIER ::= { wifiApConfig 1 }
+
+        wifiWds OBJECT IDENTIFIER ::= { wifiMib 3 }
+
+        wifiWdsConfig OBJECT IDENTIFIER ::= { wifiWds 2 }
+
+        wifiMesh OBJECT IDENTIFIER ::= { wifiMib 4 }
+
+        wifiMeshConfig OBJECT IDENTIFIER ::= { wifiMesh 2 }
+
+-- **********************************************************************
+-- *  Table
+-- **********************************************************************
+        wifiRadioInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF WifiRadioInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Wi-Fi radio info table"
+            ::= { wifiRadioInfo 1 }
+
+            wifiRadioInfoEntry OBJECT-TYPE
+            SYNTAX WifiRadioInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the wifiRadioInfoTable"
+            INDEX { wifiRadioId }
+            ::= { wifiRadioInfoTable 1 }
+
+            WifiRadioInfoEntry ::=
+            SEQUENCE {
+                wifiRadioId
+                    Integer32,
+                wifiRadioMacAddress
+                    MacAddress,
+                wifiRadioBand
+                    INTEGER,
+                wifiRadioChannel
+                    Integer32,
+                wifiRadioTxPower
+                    Integer32,
+                wifiRadioNumConnectedClients
+                    Integer32
+            }
+
+            wifiRadioId OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi radio id."
+                ::= { wifiRadioInfoEntry 1 }
+
+            wifiRadioMacAddress OBJECT-TYPE
+                SYNTAX MacAddress
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi radio MAC address."
+                ::= { wifiRadioInfoEntry 2 }
+
+            wifiRadioBand OBJECT-TYPE
+                SYNTAX INTEGER {
+                        band2dot4GHz(2400),
+                        band5GHz(5000)
+                }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi radio band."
+                ::= { wifiRadioInfoEntry 3 }
+
+            wifiRadioChannel OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi radio channel."
+                ::= { wifiRadioInfoEntry 4 }
+
+            wifiRadioTxPower OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi radio transmitted power (units:dBm).
+                    Remark:
+                    If the value equals -1, means transmitted power 
+                    not applicable in this radio."
+                ::= { wifiRadioInfoEntry 5 }
+
+            wifiRadioNumConnectedClients OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi radio number of connected clients."
+                ::= { wifiRadioInfoEntry 6 }
+
+-- **********************************************************************
+-- *  Table
+-- **********************************************************************
+        wifiApSettingsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF WifiApSettingsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Wi-Fi AP settings table"
+            ::= { wifiRadioConfig 1 }
+
+            wifiApSettingsEntry OBJECT-TYPE
+            SYNTAX WifiApSettingsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the wifiApSettingsTable"
+            INDEX { wifiApId }
+            ::= { wifiApSettingsTable 1 }
+
+            WifiApSettingsEntry ::=
+            SEQUENCE {
+                wifiApId
+                    Integer32,
+                wifiApConfigMesh
+                    Integer32,
+                wifiApConfigCountry
+                    INTEGER
+            }
+
+            wifiApId OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP id."
+                ::= { wifiApSettingsEntry 1 }
+
+            wifiApConfigMesh OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "Allowed Mesh connection.
+                    Remarks:
+                    If the value equals 0, means disable"
+                ::= { wifiApSettingsEntry 2 }
+
+            wifiApConfigCountry OBJECT-TYPE
+                SYNTAX INTEGER{
+                    argentina(32),
+                    australia(36),
+                    austria(40),
+                    bahrain(48),
+                    belgium(56),
+                    bolivia(68),
+                    brazil(76),
+                    bulgaria(100),
+                    canada(124),
+                    chile(152),
+                    china(156),
+                    cyprus(196),
+                    czech-republic(203),
+                    denmark(208),
+                    egypt(818),
+                    el-salvador(222),
+                    estonia(233),
+                    finland(246),
+                    france(250),
+                    germany(276),
+                    greece(300),
+                    guatemala(320),
+                    hong-kong(344),
+                    hungary(348),
+                    iceland(352),
+                    india(356),
+                    indonesia(360),
+                    ireland(372),
+                    israel(376),
+                    italy(380),
+                    japan(392),
+                    jordan(400),
+                    kenya(404),
+                    kuwait(414),
+                    latvia(428),
+                    lebanon(422),
+                    liechtenstein(438),
+                    lithuania(440),
+                    luxembourg(442),
+                    malaysia(458),
+                    malta(470),
+                    mexico(484),
+                    netherlands(528),
+                    new-zealand(554),
+                    norway(578),
+                    panama(591),
+                    peru(604),
+                    philippines(608),
+                    poland(616),
+                    portugal(620),
+                    puerto-rico(630),
+                    qatar(634),
+                    romania(642),
+                    russia(643),
+                    saudi-arabia(682),
+                    serbia-and-montenegro(891),
+                    singapore(702),
+                    slovak-republic(703),
+                    slovenia(705),
+                    south-africa(710),
+                    south-korea(410),
+                    spain(724),
+                    sri-lanka(144),
+                    sweden(752),
+                    switzerland(756),
+                    taiwan(158),
+                    thailand(764),
+                    trinidad-and-tobago(780),
+                    tunisia(788),
+                    turkey(792),
+                    united-arab-emirates(784),
+                    united-kingdom(826),
+                    united-states(840),
+                    uruguay(858),
+                    vietnam(704)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "This attribute indicates the region of operation
+                    for which the wireless interface is intended."
+                ::= { wifiApSettingsEntry 3 }
+
+
+-- **********************************************************************
+-- *  Table
+-- **********************************************************************
+        wifiRadioConfigApWlanTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF WifiRadioConfigApWlanEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Wi-Fi radio config WLAN table"
+            ::= { wifiRadioConfig 2 }
+
+            wifiRadioConfigApWlanEntry OBJECT-TYPE
+            SYNTAX WifiRadioConfigApWlanEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the wifiRadioConfigApWlanTable"
+            INDEX { wifiApId, wifiRadioId, wifiApWlanId }
+            ::= { wifiRadioConfigApWlanTable 1 }
+
+            WifiRadioConfigApWlanEntry ::=
+            SEQUENCE {
+                wifiRadioConfigApSSIDEnable
+                    INTEGER
+            }
+
+            wifiRadioConfigApSSIDEnable OBJECT-TYPE
+                SYNTAX INTEGER {
+                        disable(0),
+                        enable(1)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "Configure SSID enable(per radio)"
+                ::= { wifiRadioConfigApWlanEntry 1 }
+
+-- **********************************************************************
+-- *  Table
+-- **********************************************************************
+        wifiRadioConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF WifiRadioConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Wi-Fi radio config table"
+            ::= { wifiRadioConfig 3 }
+
+            wifiRadioConfigEntry OBJECT-TYPE
+            SYNTAX WifiRadioConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the wifiRadioConfigTable"
+            INDEX { wifiApId, wifiRadioId }
+            ::= { wifiRadioConfigTable 1 }
+
+            WifiRadioConfigEntry ::=
+            SEQUENCE {
+                wifiApConfigChannelWidth
+                    INTEGER,
+                wifiApConfigChannel
+                    INTEGER,
+                wifiApConfigPowerBoost
+                    INTEGER,
+                wifiApConfigTxPower
+                    Integer32,
+                wifiApConfigCustomTxPower
+                    INTEGER,
+                wifiApConfigClientSignalThreshold
+                    INTEGER,
+                wifiApConfigMaxClientAssociation
+                    INTEGER
+            }
+
+            wifiApConfigChannelWidth OBJECT-TYPE
+                SYNTAX INTEGER {
+                    auto(0),
+                    ht20MHz(20),
+                    ht20MHzOr40Mhz(2040),
+                    ht40MHz(40),
+                    vht80MHz(80)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "This attribute indicates the channel width(MHz)."
+                ::= { wifiRadioConfigEntry 1 }
+
+            wifiApConfigChannel OBJECT-TYPE
+                SYNTAX INTEGER{
+                    auto(0),
+                    ch1(1),
+                    ch2(2),
+                    ch3(3),
+                    ch4(4),
+                    ch5(5),
+                    ch6(6),
+                    ch7(7),
+                    ch8(8),
+                    ch9(9),
+                    ch10(10),
+                    ch11(11),
+                    ch12(12),
+                    ch13(13),
+                    ch36(36),
+                    ch40(40),
+                    ch44(44),
+                    ch48(48),
+                    ch52(52),
+                    ch56(56),
+                    ch60(60),
+                    ch64(64),
+                    ch100(100),
+                    ch104(104),
+                    ch108(108),
+                    ch112(112),
+                    ch116(116),
+                    ch120(120),
+                    ch124(124),
+                    ch128(128),
+                    ch132(132),
+                    ch136(136),
+                    ch140(140),
+                    ch149(149),
+                    ch153(153),
+                    ch157(157),
+                    ch161(161),
+                    ch165(165)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "This attribute indicates the channel number to be
+                    used. The default value is auto(0)."
+                ::= { wifiRadioConfigEntry 2 }
+
+            wifiApConfigPowerBoost OBJECT-TYPE
+                SYNTAX INTEGER {
+                    disable(0),
+                    enable(1)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "This attribute indicates the power boost."
+                ::= { wifiRadioConfigEntry 3 }
+
+            wifiApConfigTxPower OBJECT-TYPE
+                SYNTAX INTEGER {
+                    max(1),
+                    high(2),
+                    medium(3),
+                    low(4),
+                    custom(0)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "This attribute indicates the transmit output power."
+                ::= { wifiRadioConfigEntry 4 }
+
+            wifiApConfigCustomTxPower OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "This attribute indicates the custom transmit output power [3..30] (units:dBm).
+                    Remarks:
+                    If the value equals 0, means custom transmit output power not applicable."
+                ::= { wifiRadioConfigEntry 5 }
+
+            wifiApConfigClientSignalThreshold OBJECT-TYPE
+                SYNTAX INTEGER (0..94)
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "This attribute indicates the client signal threshold [0..94].
+                    Remarks:
+                    If the value equals 0, means unlimited."
+                ::= { wifiRadioConfigEntry 6 }
+
+            wifiApConfigMaxClientAssociation OBJECT-TYPE
+                SYNTAX INTEGER (0..64)
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "This attribute indicates the maximum number of clients [0..64].
+                    Remarks:
+                    If the value equals 0, means unlimited."
+                ::= { wifiRadioConfigEntry 7 }
+
+        wifiApWlanInfo OBJECT IDENTIFIER ::= { wifiApInfo 2 }
+
+-- **********************************************************************
+-- *  Table
+-- **********************************************************************
+        wifiApWlanInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF WifiApWlanInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Wi-Fi AP WLAN info table"
+            ::= { wifiApWlanInfo 1 }
+
+            wifiApWlanInfoEntry OBJECT-TYPE
+            SYNTAX WifiApWlanInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the wifiApWlanInfoTable"
+            INDEX { wifiApWlanId }
+            ::= { wifiApWlanInfoTable 1 }
+
+            WifiApWlanInfoEntry ::=
+            SEQUENCE {
+                wifiApWlanId
+                    Integer32,
+                wifiApWlanInfoSsid
+                    OCTET STRING,
+                wifiApWlanInfoSsidStatus
+                    INTEGER,
+                wifiApWlanInfoBroadcastSsid
+                    INTEGER,
+                wifiApWlanInfoVlanId
+                    INTEGER
+            }
+
+            wifiApWlanId OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN id."
+                ::= { wifiApWlanInfoEntry 1 }
+
+            wifiApWlanInfoSsid OBJECT-TYPE
+                SYNTAX OCTET STRING(SIZE(1..32))
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN SSID."
+                ::= { wifiApWlanInfoEntry 2 }
+
+            wifiApWlanInfoSsidStatus OBJECT-TYPE
+                SYNTAX INTEGER {
+                        disable(0),
+                        enable(1)
+                }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN SSID status."
+                ::= { wifiApWlanInfoEntry 3 }
+
+            wifiApWlanInfoBroadcastSsid OBJECT-TYPE
+                SYNTAX INTEGER {
+                        disable(0),
+                        enable(1)
+                }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN broadcast SSID status."
+                ::= { wifiApWlanInfoEntry 4 }
+
+            wifiApWlanInfoVlanId OBJECT-TYPE
+                SYNTAX INTEGER(0..4094)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN vlan id.
+                     Remarks: Non-zero value means valid tagged vlan id"
+                ::= { wifiApWlanInfoEntry 5 }
+
+-- **********************************************************************
+-- *  Table
+-- **********************************************************************
+        wifiApWlanBandInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF WifiApWlanBandInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Wi-Fi AP WLAN MAC table"
+            ::= { wifiApWlanInfo 2 }
+
+            wifiApWlanBandInfoEntry OBJECT-TYPE
+            SYNTAX WifiApWlanBandInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the wifiApWlanBandInfoTable"
+            INDEX { wifiRadioId, wifiApWlanId }
+            ::= { wifiApWlanBandInfoTable 1 }
+
+            WifiApWlanBandInfoEntry ::=
+            SEQUENCE {
+                wifiApWlanBssid
+                    MacAddress
+            }
+
+            wifiApWlanBssid OBJECT-TYPE
+                SYNTAX MacAddress
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN BSSID."
+                ::= { wifiApWlanBandInfoEntry 1 }
+
+-- **********************************************************************
+-- *  Table
+-- **********************************************************************
+        wifiApWlanAdvancedInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF WifiApWlanAdvancedInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Wi-Fi AP WLAN info table"
+            ::= { wifiApWlanInfo 3 }
+
+            wifiApWlanAdvancedInfoEntry OBJECT-TYPE
+            SYNTAX WifiApWlanAdvancedInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the wifiApWlanAdvancedInfoTable"
+            INDEX { wifiApWlanId }
+            ::= { wifiApWlanAdvancedInfoTable 1 }
+
+            WifiApWlanAdvancedInfoEntry ::=
+            SEQUENCE {
+                wifiApWlanInfoPmkCaching
+                    INTEGER
+            }
+
+            wifiApWlanInfoPmkCaching OBJECT-TYPE
+                SYNTAX INTEGER {
+                        disable(0),
+                        enable(1)
+                }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN PMK caching status."
+                ::= { wifiApWlanAdvancedInfoEntry 1 }
+
+-- **********************************************************************
+-- *  Table
+-- **********************************************************************
+        wifiApWlanSecurityInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF WifiApWlanSecurityInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Wi-Fi AP WLAN security table"
+            ::= { wifiApWlanInfo 4 }
+
+            wifiApWlanSecurityInfoEntry OBJECT-TYPE
+            SYNTAX WifiApWlanSecurityInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the wifiApWlanSecurityInfoTable"
+            INDEX { wifiApWlanId }
+            ::= { wifiApWlanSecurityInfoTable 1 }
+
+            WifiApWlanSecurityInfoEntry ::=
+            SEQUENCE {
+                wifiApWlanInfoSecurityPolicy
+                    INTEGER,
+                wifiApWlanInfoEncryption
+                    INTEGER
+            }
+
+            wifiApWlanInfoSecurityPolicy OBJECT-TYPE
+                SYNTAX INTEGER {
+                        open(0),
+                        wpa2Psk(1),
+                        wpaOrWpa2Psk(2),
+                        wpa3Psk(3),
+                        wpa2OrWpa3Psk(4),
+                        wpa2(5),
+                        wpaOrWpa2(6),
+                        owe(7),
+                        wpa3(8)
+                }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN security policy."
+                ::= { wifiApWlanSecurityInfoEntry 1 }
+
+            wifiApWlanInfoEncryption OBJECT-TYPE
+                SYNTAX INTEGER {
+                        none(0),
+                        aes(1),
+                        tkipOrAes(2)
+                }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN encryption."
+                ::= { wifiApWlanSecurityInfoEntry 2 }
+
+-- **********************************************************************
+-- *  Table
+-- **********************************************************************
+        wifiApWlanStatTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF WifiApWlanStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Wi-Fi AP WLAN stat table"
+            ::= { wifiApWlanInfo 5 }
+
+            wifiApWlanStatEntry OBJECT-TYPE
+            SYNTAX WifiApWlanStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the wifiApWlanStatTable"
+            INDEX { wifiApWlanId }
+            ::= { wifiApWlanStatTable 1 }
+
+            WifiApWlanStatEntry ::=
+            SEQUENCE {
+                wifiApWlanNumConnectedClients
+                    Integer32,
+                wifiApWlanTxPackets
+                    Counter64,
+                wifiApWlanRxPackets
+                    Counter64,
+                wifiApWlanTxByte
+                    Counter64,
+                wifiApWlanRxByte
+                    Counter64,
+                wifiApWlanTxErrorPackets
+                    Counter64,
+                wifiApWlanRxErrorPackets
+                    Counter64,
+                wifiApWlanTxRetriesPackets
+                    Counter64
+            }
+
+            wifiApWlanNumConnectedClients OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN number of connected clients."
+                ::= { wifiApWlanStatEntry 1 }
+
+            wifiApWlanTxPackets OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN transmitted packets."
+                ::= { wifiApWlanStatEntry 2 }
+
+            wifiApWlanRxPackets OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN revceived packets."
+                ::= { wifiApWlanStatEntry 3 }
+
+            wifiApWlanTxByte OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN transmitted bytes."
+                ::= { wifiApWlanStatEntry 4 }
+
+            wifiApWlanRxByte OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN revceived bytes."
+                ::= { wifiApWlanStatEntry 5 }
+
+            wifiApWlanTxErrorPackets OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN transmitted error packets."
+                ::= { wifiApWlanStatEntry 6 }
+
+            wifiApWlanRxErrorPackets OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN received error packets."
+                ::= { wifiApWlanStatEntry 7 }
+
+            wifiApWlanTxRetriesPackets OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN transmitted retry packets."
+                ::= { wifiApWlanStatEntry 8 }
+
+-- **********************************************************************
+-- *  Table
+-- **********************************************************************
+        wifiApWlanBandStatTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF WifiApWlanBandStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Wi-Fi AP WLAN band stat table"
+            ::= { wifiApWlanInfo 6 }
+
+            wifiApWlanBandStatEntry OBJECT-TYPE
+            SYNTAX WifiApWlanBandStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the wifiApWlanBandStatTable"
+            INDEX { wifiRadioId, wifiApWlanId }
+            ::= { wifiApWlanBandStatTable 1 }
+
+            WifiApWlanBandStatEntry ::=
+            SEQUENCE {
+                wifiApWlanBandNumConnectedClients
+                    Integer32,
+                wifiApWlanBandTxPackets
+                    Counter64,
+                wifiApWlanBandRxPackets
+                    Counter64,
+                wifiApWlanBandTxByte
+                    Counter64,
+                wifiApWlanBandRxByte
+                    Counter64,
+                wifiApWlanBandTxErrorPackets
+                    Counter64,
+                wifiApWlanBandRxErrorPackets
+                    Counter64,
+                wifiApWlanBandTxRetriesPackets
+                    Counter64
+            }
+
+            wifiApWlanBandNumConnectedClients OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN band number of connected clients."
+                ::= { wifiApWlanBandStatEntry 1 }
+
+            wifiApWlanBandTxPackets OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN band transmitted packets."
+                ::= { wifiApWlanBandStatEntry 2 }
+
+            wifiApWlanBandRxPackets OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN band revceived packets."
+                ::= { wifiApWlanBandStatEntry 3 }
+
+            wifiApWlanBandTxByte OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN band transmitted bytes."
+                ::= { wifiApWlanBandStatEntry 4 }
+
+            wifiApWlanBandRxByte OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN band revceived bytes."
+                ::= { wifiApWlanBandStatEntry 5 }
+
+            wifiApWlanBandTxErrorPackets OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN band transmitted error packets."
+                ::= { wifiApWlanBandStatEntry 6 }
+
+            wifiApWlanBandRxErrorPackets OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN band received error packets."
+                ::= { wifiApWlanBandStatEntry 7 }
+
+            wifiApWlanBandTxRetriesPackets OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN band transmitted retry packets."
+                ::= { wifiApWlanBandStatEntry 8 }
+
+        wifiApStaInfo OBJECT IDENTIFIER ::= { wifiApInfo 3 }
+
+-- **********************************************************************
+-- *  Table
+-- **********************************************************************
+        wifiApStaInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF WifiApStaInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "AP station info table"
+            ::= { wifiApStaInfo 1 }
+
+            wifiApStaInfoEntry OBJECT-TYPE
+            SYNTAX WifiApStaInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the wifiApStaInfoTable"
+            INDEX { wifiRadioId, wifiApWlanId, wifiApStaId }
+            ::= { wifiApStaInfoTable 1 }
+
+            WifiApStaInfoEntry ::=
+            SEQUENCE {
+                wifiApStaId
+                    Integer32,
+                wifiApStaMacAddress
+                    MacAddress,
+                wifiApStaIpAddress
+                    IpAddress,
+                wifiApStaRadioPolicy
+                    INTEGER,
+                wifiApStaConnectionTime
+                    OCTET STRING,
+                wifiApStaSignalRssi
+                    Integer32
+            }
+
+            wifiApStaId OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP Station id."
+                ::= { wifiApStaInfoEntry 1 }
+
+            wifiApStaMacAddress OBJECT-TYPE
+                SYNTAX MacAddress
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP Station MAC address."
+                ::= { wifiApStaInfoEntry 2 }
+
+            wifiApStaIpAddress OBJECT-TYPE
+                SYNTAX IpAddress
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP Station IP address."
+                ::= { wifiApStaInfoEntry 3 }
+
+            wifiApStaRadioPolicy OBJECT-TYPE
+                SYNTAX INTEGER{
+                        radio802dot11b(0),
+                        radio802dot11g(1),
+                        radio802dot11a(2),
+                        radio802dot11ng(3),
+                        radio802dot11na(4),
+                        radio802dot11ac(5),
+                        radio802dot11ax(6)
+                }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP Station radio policy."
+                ::= { wifiApStaInfoEntry 4 }
+
+            wifiApStaConnectionTime OBJECT-TYPE
+                SYNTAX OCTET STRING
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP Station connection time."
+                ::= { wifiApStaInfoEntry 5 }
+
+            wifiApStaSignalRssi OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP Station RSSI."
+                ::= { wifiApStaInfoEntry 6 }
+
+-- **********************************************************************
+-- *  Table
+-- **********************************************************************
+        wifiApStaStatTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF WifiApStaStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "AP station stat table"
+            ::= { wifiApStaInfo 2 }
+
+            wifiApStaStatEntry OBJECT-TYPE
+            SYNTAX WifiApStaStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the wifiApStaStatTable"
+            INDEX { wifiRadioId, wifiApWlanId, wifiApStaId }
+            ::= { wifiApStaStatTable 1 }
+
+            WifiApStaStatEntry ::=
+            SEQUENCE {
+                wifiApStaTxPackets
+                    Counter64,
+                wifiApStaRxPackets
+                    Counter64,
+                wifiApStaTxBytes
+                    Counter64,
+                wifiApStaRxBytes
+                    Counter64,
+                wifiApStaTxErrorPackets
+                    Counter64,
+                wifiApStaRxErrorPackets
+                    Counter64,
+                wifiApStaTxRate
+                    Counter64,
+                wifiApStaRxRate
+                    Counter64,
+                wifiApStaTxRetriesPackets
+                    Counter64
+            }
+
+            wifiApStaTxPackets OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP Station transmitted packets."
+                ::= { wifiApStaStatEntry 1 }
+
+            wifiApStaRxPackets OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP Station received packets."
+                ::= { wifiApStaStatEntry 2 }
+
+            wifiApStaTxBytes OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP Station transmitted bytes."
+                ::= { wifiApStaStatEntry 3 }
+
+            wifiApStaRxBytes OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP Station received bytes."
+                ::= { wifiApStaStatEntry 4 }
+
+            wifiApStaTxErrorPackets OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP Station transmitted error packets."
+                ::= { wifiApStaStatEntry 5 }
+
+           wifiApStaRxErrorPackets OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP Station received error packets."
+                ::= { wifiApStaStatEntry 6 }
+
+            wifiApStaTxRate OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP Station transmitted rate (units:bps)."
+                ::= { wifiApStaStatEntry 7 }
+
+            wifiApStaRxRate OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP Station received rate (units:bps)."
+                ::= { wifiApStaStatEntry 8 }
+
+            wifiApStaTxRetriesPackets OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP Station transmitted retry packets."
+                ::= { wifiApStaStatEntry 9 }
+
+-- **********************************************************************
+-- *  Table
+-- **********************************************************************
+        wifiApWlanConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF WifiApWlanConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Wi-Fi AP WLAN config table"
+            ::= { wifiApWlanConfig 1 }
+
+            wifiApWlanConfigEntry OBJECT-TYPE
+            SYNTAX WifiApWlanConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the wifiApWlanConfigTable"
+            INDEX { wifiApWlanId }
+            ::= { wifiApWlanConfigTable 1 }
+
+            WifiApWlanConfigEntry ::=
+            SEQUENCE {
+                wifiApWlanConfigRowControl
+                    RowStatus,
+                wifiApWlanConfigSsid
+                    OCTET STRING,
+                wifiApWlanConfigSsidEnable
+                    INTEGER,
+                wifiApWlanConfigBroadcastSsid
+                    INTEGER,
+                wifiApWlanConfigVlanId
+                    INTEGER,
+                wifiApWlanConfigVlanPoolEnable
+                    INTEGER,
+                wifiApWlanConfigVlanPoolList
+                    OCTET STRING
+            }
+
+            wifiApWlanConfigRowControl OBJECT-TYPE
+                SYNTAX RowStatus
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                    "The WLAN status.
+                    Supported values:
+                    active(1)      - valid entry
+                    notReady(3)    - non-valid entry
+                    createAndGo(4) - used to create a new entry
+                    destroy(6)     - removes the entry"
+                ::= { wifiApWlanConfigEntry 1 }
+
+            wifiApWlanConfigSsid OBJECT-TYPE
+                SYNTAX OCTET STRING(SIZE(1..32))
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN SSID."
+                ::= { wifiApWlanConfigEntry 2 }
+
+            wifiApWlanConfigSsidEnable OBJECT-TYPE
+                SYNTAX INTEGER {
+                        disable(0),
+                        enable(1)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN SSID status."
+                ::= { wifiApWlanConfigEntry 3 }
+
+            wifiApWlanConfigBroadcastSsid OBJECT-TYPE
+                SYNTAX INTEGER {
+                        disable(0),
+                        enable(1)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN broadcast SSID status."
+                ::= { wifiApWlanConfigEntry 4 }
+
+            wifiApWlanConfigVlanId OBJECT-TYPE
+                SYNTAX INTEGER(0..4094)
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN vlan id.
+                     Remarks: Non-zero value means valid tagged vlan id"
+                ::= { wifiApWlanConfigEntry 5 }
+
+            wifiApWlanConfigVlanPoolEnable OBJECT-TYPE
+                SYNTAX INTEGER {
+                        disable(0),
+                        enable(1)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN vlan pool enable."
+                ::= { wifiApWlanConfigEntry 6 }
+
+            wifiApWlanConfigVlanPoolList OBJECT-TYPE
+                SYNTAX OCTET STRING
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN vlan pool."
+                ::= { wifiApWlanConfigEntry 7 }
+
+-- **********************************************************************
+-- *  Table
+-- **********************************************************************
+        wifiApWlanConfigSecurityTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF WifiApWlanConfigSecurityEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                    "Wi-Fi AP WLAN config security table"
+                ::= { wifiApWlanConfig 2 }
+
+            wifiApWlanConfigSecurityEntry OBJECT-TYPE
+                SYNTAX WifiApWlanConfigSecurityEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                    "An entry in the wifiApWlanConfigSecurityTable."
+                    INDEX { wifiApWlanId }
+                ::= { wifiApWlanConfigSecurityTable 1 }
+
+            WifiApWlanConfigSecurityEntry ::=
+            SEQUENCE {
+                wifiApWlanConfigSecurityPolicy
+                    INTEGER,
+                wifiApWlanConfigPassphrase
+                    OCTET STRING
+             }
+
+            wifiApWlanConfigSecurityPolicy OBJECT-TYPE
+                SYNTAX INTEGER {
+                        open(0),
+                        wpa2Psk(1),
+                        wpaOrWpa2Psk(2),
+                        wpa3Psk(3),
+                        wpa2OrWpa3Psk(4),
+                        wpa2(5),
+                        wpaOrWpa2(6),
+                        owe(7),
+                        wpa3(8)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "This attribute indicates the security level of the wireless network."
+                ::= { wifiApWlanConfigSecurityEntry 1 }
+
+            wifiApWlanConfigPassphrase OBJECT-TYPE
+                SYNTAX OCTET STRING(SIZE(8..64))
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "This attribute indicates the passphrase of the wireless network.
+                    Remarks:
+                    8 to 63 characters or 64 hex characters."
+                ::= { wifiApWlanConfigSecurityEntry 2 }
+
+-- **********************************************************************
+-- *  Table
+-- **********************************************************************
+        wifiWdsConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF WifiWdsConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "WDS config table."
+            ::= { wifiWdsConfig 1 }
+
+            wifiWdsConfigEntry OBJECT-TYPE
+            SYNTAX WifiWdsConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the wifiWdsConfigTable."
+            INDEX { wifiWdsConfigId }
+            ::= { wifiWdsConfigTable 1 }
+
+            WifiWdsConfigEntry ::=
+                SEQUENCE {
+                    wifiWdsConfigId
+                        INTEGER,
+                    wifiWdsConfigRowControl
+                        RowStatus,
+                    wifiWdsConfigMacAddress
+                        MacAddress,
+                    wifiWdsConfigEnable
+                        INTEGER,
+                    wifiWdsConfigEncryptKey
+                        OCTET STRING,
+                    wifiWdsConfigRadioBand
+                        INTEGER
+                }
+
+                wifiWdsConfigId OBJECT-TYPE
+                    SYNTAX INTEGER
+                    MAX-ACCESS read-only
+                    STATUS current
+                    DESCRIPTION
+                        "This attribute indicates the WDS config index"
+                    ::= { wifiWdsConfigEntry 1 }
+
+                wifiWdsConfigRowControl OBJECT-TYPE
+                    SYNTAX RowStatus
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "The WDS config status.
+                        Supported values:
+                        active(1)      - valid entry
+                        notReady(3)    - non-valid entry
+                        createAndGo(4) - used to create a new entry
+                        destroy(6)     - removes the entry"
+                    ::= { wifiWdsConfigEntry 2 }
+
+                wifiWdsConfigMacAddress OBJECT-TYPE
+                    SYNTAX MacAddress
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "This field should indicate an MAC address entry in the
+                        WDS config."
+                    ::= { wifiWdsConfigEntry 3 }
+
+                wifiWdsConfigEnable OBJECT-TYPE
+                    SYNTAX INTEGER{
+                        disable(0),
+                        enable(1)
+                    }
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "This attribute indicates enable status of WDS config."
+                    ::= { wifiWdsConfigEntry 4 }
+
+                wifiWdsConfigEncryptKey OBJECT-TYPE
+                    SYNTAX OCTET STRING
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "This attribute indicates encryption key of WDS config."
+                    ::= { wifiWdsConfigEntry 5 }
+
+                wifiWdsConfigRadioBand OBJECT-TYPE
+                    SYNTAX INTEGER {
+                        band2dot4GHz(2400),
+                        band5GHz(5000)
+                    }
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "This attribute indicates the radio selection of WDS config."
+                    ::= { wifiWdsConfigEntry 6 }
+
+-- **********************************************************************
+-- *  Table
+-- **********************************************************************
+        wifiMeshConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF WifiMeshConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Mesh config table."
+            ::= { wifiMeshConfig 1 }
+
+            wifiMeshConfigEntry OBJECT-TYPE
+            SYNTAX WifiMeshConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the wifiMeshConfigTable."
+            INDEX { wifiMeshConfigId }
+            ::= { wifiMeshConfigTable 1 }
+
+            WifiMeshConfigEntry ::=
+                SEQUENCE {
+                    wifiMeshConfigId
+                        Integer32,
+                    wifiMeshConfigRowControl
+                        RowStatus,
+                    wifiMeshConfigMeshId
+                        OCTET STRING,
+                    wifiMeshConfigEncryptKey
+                        OCTET STRING,
+                    wifiMeshConfigRadioBand
+                        INTEGER
+                }
+
+                wifiMeshConfigId OBJECT-TYPE
+                    SYNTAX Integer32
+                    MAX-ACCESS read-only
+                    STATUS current
+                    DESCRIPTION
+                        "This attribute indicates the mesh config index"
+                    ::= { wifiMeshConfigEntry 1 }
+
+                wifiMeshConfigRowControl OBJECT-TYPE
+                    SYNTAX RowStatus
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "The mesh config status.
+                        Supported values:
+                        active(1)      - valid entry
+                        notReady(3)    - non-valid entry
+                        createAndGo(4) - used to create a new entry
+                        destroy(6)     - removes the entry"
+                    ::= { wifiMeshConfigEntry 2 }
+
+                wifiMeshConfigMeshId OBJECT-TYPE
+                SYNTAX OCTET STRING(SIZE(1..32))
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "This attribute indicates mesh id of mesh config."
+                    ::= { wifiMeshConfigEntry 3 }
+
+                wifiMeshConfigEncryptKey OBJECT-TYPE
+                    SYNTAX OCTET STRING
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "This attribute indicates encryption key of mesh config."
+                    ::= { wifiMeshConfigEntry 4 }
+
+                wifiMeshConfigRadioBand OBJECT-TYPE
+                    SYNTAX INTEGER {
+                        bandAll(0),
+                        band2dot4GHz(2400),
+                        band5GHz(5000)
+                    }
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "This attribute indicates the radio selection of mesh config."
+                    ::= { wifiMeshConfigEntry 5 }
+END

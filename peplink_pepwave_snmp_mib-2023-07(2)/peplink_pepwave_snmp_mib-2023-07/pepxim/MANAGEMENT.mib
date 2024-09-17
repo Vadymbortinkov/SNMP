@@ -1,0 +1,62 @@
+-- ********************************************************************
+        MANAGEMENT DEFINITIONS ::= BEGIN
+
+                IMPORTS
+                        OBJECT-GROUP
+                                FROM SNMPv2-CONF
+                        enterprises, Integer32, OBJECT-TYPE, MODULE-IDENTITY
+                                FROM SNMPv2-SMI;
+
+--
+-- Node definitions
+--
+-- ********************************************************************
+-- *  MODULE IDENTITY
+-- ********************************************************************
+-- The Enterprises Number
+        pepxim OBJECT IDENTIFIER ::= { enterprises 52467 }
+
+        productMib  OBJECT IDENTIFIER ::= { pepxim 200 }
+
+        generalMib OBJECT IDENTIFIER ::= { productMib 1 }
+
+        managementMib MODULE-IDENTITY
+                    LAST-UPDATED "202303211200Z"        -- 03 21, 2023 at 12:00 GMT
+                    ORGANIZATION "PEPXIM"
+                    CONTACT-INFO ""
+                    DESCRIPTION
+                        "MIB module for Management."
+            ::= { generalMib 17 }
+
+-- #####################################################################
+--
+-- **********************************************************************
+-- *  MIB attribute OBJECT-TYPE definitions follow
+-- **********************************************************************
+        deviceControl OBJECT IDENTIFIER ::= { managementMib 1 }
+
+        deviceCommands OBJECT IDENTIFIER ::= { deviceControl 1 }
+
+            deviceSaveAndActivate OBJECT-TYPE
+                SYNTAX INTEGER {
+                    none(0),
+                    enable(1)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "Setting this object triggers the device to activate the configuration."
+                ::= { deviceCommands 1 }
+
+            deviceReboot OBJECT-TYPE
+                SYNTAX INTEGER {
+                    rebootCurrentFlash(0),
+                    rebootFlash1(1),
+                    rebootFlash2(2)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "Setting this object triggers the device to reboot."
+                ::= { deviceCommands 2 }
+END
